@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "995112365714",
+    "firebase_url": "https://pluks-chat-app.firebaseio.com",
+    "project_id": "pluks-chat-app",
+    "storage_bucket": "pluks-chat-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995112365714:android:425def35b70fad149a004b",
+        "android_client_info": {
+          "package_name": "com.example.pluks_chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "995112365714-q6rn429i6v5leu42tm1jp0civarvpub7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLuVc-5KcfpPUp28BO-iCqNAk_CHfyrsQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "995112365714-q6rn429i6v5leu42tm1jp0civarvpub7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
