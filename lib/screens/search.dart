@@ -53,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           children: <Widget>[
             Container(
-              color: Theme.of(context).accentColor,
+              color: Colors.white,
               padding: EdgeInsets.symmetric(
                 horizontal: 24,
                 vertical: 16,
@@ -78,12 +78,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 40,
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(40),
                       ),
                       child: Icon(
                         Icons.search,
-                        color: Theme.of(context).primaryColor,
+                        color: Theme.of(context).accentColor,
                       ),
                     ),
                   ),
@@ -142,14 +142,14 @@ class SearchTile extends StatelessWidget {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
                 borderRadius: BorderRadius.circular(30),
               ),
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Text(
                 'Message',
                 style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.white,
                 ),
               ),
             ),

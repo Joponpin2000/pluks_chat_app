@@ -94,8 +94,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 50),
                       AlertDialog(
-                        backgroundColor: Colors.red,
-                        content: Text(error),
+                        content: Text(
+                          error,
+                          style: TextStyle(color: Colors.red),
+                        ),
                         elevation: 1,
                       ),
                       SizedBox(height: 12),
@@ -133,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Text(
                             'Forgot Password?',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: Theme.of(context).primaryColor,
                             ),
                           ),
                         ],
@@ -147,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           alignment: Alignment.center,
                           width: MediaQuery.of(context).size.width,
                           padding: EdgeInsets.symmetric(vertical: 15),
-                          color: Colors.blue,
+                          color: Theme.of(context).primaryColor,
                           child: Text(
                             'Login',
                             style: TextStyle(color: Colors.white),
@@ -165,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             'Create Account',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: Theme.of(context).accentColor,
                             ),
                           ),
                         ),

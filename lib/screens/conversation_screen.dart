@@ -101,7 +101,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ),
                         child: Icon(
                           Icons.send,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).accentColor,
                         ),
                       ),
                     ),
@@ -145,12 +145,12 @@ class MessageTile extends StatelessWidget {
                   bottomRight: Radius.circular(23),
                 ),
           color: isSendByMe
-              ? Theme.of(context).accentColor
-              : Theme.of(context).primaryColor,
+              ? Theme.of(context).primaryColor
+              : Theme.of(context).accentColor,
         ),
         child: Text(
           message,
-          style: TextStyle(color: Colors.grey, fontSize: 17),
+          style: TextStyle(fontSize: 17),
         ),
       ),
     );

@@ -62,14 +62,12 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Text('Pluks'),
         actions: <Widget>[
-          GestureDetector(
-            onTap: () async {
+          FlatButton.icon(
+            onPressed: () async {
               await authClass.signOut();
             },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Icon(Icons.exit_to_app),
-            ),
+            icon: Icon(Icons.exit_to_app),
+            label: Text('Logout'),
           ),
         ],
       ),
@@ -83,8 +81,10 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           );
         },
-        child: Icon(Icons.search),
-        backgroundColor: Colors.red,
+        child: Icon(
+          Icons.search,
+        ),
+        backgroundColor: Theme.of(context).accentColor,
         tooltip: 'Search',
       ),
     );
@@ -125,7 +125,7 @@ class ChatRoomTile extends StatelessWidget {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).accentColor,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),

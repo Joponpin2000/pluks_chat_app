@@ -82,8 +82,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       SizedBox(height: 50),
                       AlertDialog(
-                        backgroundColor: Colors.red,
-                        content: Text(error),
+                        content: Text(
+                          error,
+                          style: TextStyle(color: Colors.red),
+                        ),
                         elevation: 1,
                       ),
                       SizedBox(height: 12),
@@ -132,10 +134,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           alignment: Alignment.center,
                           width: MediaQuery.of(context).size.width,
                           padding: EdgeInsets.symmetric(vertical: 15),
-                          color: Colors.blue,
+                          color: Theme.of(context).primaryColor,
                           child: Text(
                             'Register',
-                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
@@ -151,7 +152,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Text(
                                 'Already have an account?',
                                 style: TextStyle(
-                                  color: Colors.grey[600],
+                                  color: Theme.of(context).primaryColor,
                                 ),
                               ),
                               GestureDetector(
@@ -162,7 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   child: Text(
                                     'Login',
                                     style: TextStyle(
-                                      color: Colors.blue,
+                                      color: Theme.of(context).accentColor,
                                     ),
                                   ),
                                 ),

@@ -34,9 +34,9 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Pluks',
       theme: ThemeData(
-        primarySwatch: Colors.grey,
-        primaryColor: Colors.red,
-        accentColor: Colors.white,
+        primarySwatch: Colors.grey[300],
+        primaryColor: Colors.grey[700],
+        accentColor: Colors.black87,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: userIsLoggedIn ? ChatScreen() : Authenticate(),
