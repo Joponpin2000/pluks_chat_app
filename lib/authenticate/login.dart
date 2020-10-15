@@ -92,13 +92,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 50),
-                      AlertDialog(
-                        content: Text(
+                      SizedBox(height: 10),
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        child: Text(
                           error,
                           style: TextStyle(color: Colors.red),
                         ),
-                        elevation: 1,
                       ),
                       SizedBox(height: 12),
                       Form(
@@ -163,7 +163,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Container(
                           alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(vertical: 5),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 10),
                           child: Text(
                             'Create Account',
                             style: TextStyle(

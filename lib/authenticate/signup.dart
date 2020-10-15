@@ -80,13 +80,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 50),
-                      AlertDialog(
-                        content: Text(
+                      SizedBox(height: 10),
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        child: Text(
                           error,
                           style: TextStyle(color: Colors.red),
                         ),
-                        elevation: 1,
                       ),
                       SizedBox(height: 12),
                       Form(
@@ -101,7 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ? 'Username can\'t be empty'
                                   : null,
                             ),
-                            SizedBox(height: 30),
+                            SizedBox(height: 10),
                             TextFormField(
                               decoration: InputDecoration(hintText: 'Email'),
                               controller: emailController,
@@ -113,7 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     : "Please provide a valid Email";
                               },
                             ),
-                            SizedBox(height: 30),
+                            SizedBox(height: 10),
                             TextFormField(
                               decoration: InputDecoration(hintText: 'Password'),
                               obscureText: true,

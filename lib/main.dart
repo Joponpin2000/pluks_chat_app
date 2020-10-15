@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Pluks',
       theme: ThemeData(
-        primarySwatch: Colors.grey[300],
+        // primarySwatch: Colors.grey[300],
         primaryColor: Colors.grey[700],
         accentColor: Colors.black87,
         visualDensity: VisualDensity.adaptivePlatformDensity,
