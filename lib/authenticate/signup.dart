@@ -3,6 +3,7 @@ import 'package:pluks_chat_app/screens/chat_screen.dart';
 import 'package:pluks_chat_app/services/auth.dart';
 import 'package:pluks_chat_app/services/database.dart';
 import 'package:pluks_chat_app/shared/helper_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class SignUpScreen extends StatefulWidget {
   final Function toggleView;
@@ -13,19 +14,21 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
   bool isLoading = false;
 
   AuthClass authClass = new AuthClass();
   final DatabaseClass databaseClass = new DatabaseClass();
 
   final _key = GlobalKey<FormState>();
+  bool _obscureText = true;
 
   String error = '';
   TextEditingController usernameController = new TextEditingController();
   TextEditingController emailController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
 
-  register() {
+  register() async {
     if (_key.currentState.validate()) {
       Map<String, String> userMap = {
         "name": usernameController.text,
@@ -38,21 +41,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
         isLoading = true;
       });
 
-      authClass
-          .registerWithEmailAndPassword(
-              emailController.text, passwordController.text)
-          .then(
-        (value) async {
-          await databaseClass.uploadUserInfo(userMap);
-          HelperFunctions.saveUserLoggedInSharedPreference(true);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatScreen(),
-            ),
-          );
-        },
-      );
+      try {
+        auth.UserCredential result = await _auth.createUserWithEmailAndPassword(
+            email: emailController.text, password: usernameController.text);
+        auth.User firebaseUser = result.user;
+
+        AuthClass().userFromFirebaseUser(firebaseUser);
+        await databaseClass.uploadUserInfo(userMap);
+
+        // Save user info to shared preference
+        HelperFunctions.saveUserLoggedInSharedPreference(true);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatsScreen(),
+          ),
+        );
+      } catch (e) {
+        setState(() {
+          switch (e.code) {
+            case "ERROR_INVALID_EMAIL":
+            case "invalid-email":
+              error = "Email address is invalid.";
+              break;
+            case "ERROR_TOO_MANY_REQUESTS":
+              error = "Too many requests, try again later.";
+              break;
+            case "ERROR_OPERATION_NOT_ALLOWED":
+            case "operation-not-allowed":
+              error = "Server error, please try again later.";
+              break;
+            default:
+              error = "Signup failed. Please try again.";
+              break;
+          }
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -81,13 +106,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 10),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          error,
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
+                      error.isNotEmpty
+                          ? Container(
+                              padding: EdgeInsets.all(8),
+                              color: Colors.orangeAccent,
+                              child: Center(
+                                child: Text(
+                                  error,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            )
+                          : Container(),
                       SizedBox(height: 12),
                       Form(
                         key: _key,
@@ -95,13 +125,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: <Widget>[
                             TextFormField(
                               decoration: InputDecoration(hintText: 'Username'),
-                              obscureText: true,
                               controller: usernameController,
                               validator: (value) => value == ''
                                   ? 'Username can\'t be empty'
                                   : null,
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 5),
                             TextFormField(
                               decoration: InputDecoration(hintText: 'Email'),
                               controller: emailController,
@@ -113,10 +142,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     : "Please provide a valid Email";
                               },
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 5),
                             TextFormField(
-                              decoration: InputDecoration(hintText: 'Password'),
-                              obscureText: true,
+                              decoration: InputDecoration(
+                                hintText: 'Password',
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  color: Theme.of(context).primaryColor,
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                ),
+                              ),
+                              obscureText: _obscureText,
                               controller: passwordController,
                               validator: (value) => value.length < 6
                                   ? 'Password should be 6+ chars long'
@@ -137,6 +181,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           color: Theme.of(context).primaryColor,
                           child: Text(
                             'Register',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),

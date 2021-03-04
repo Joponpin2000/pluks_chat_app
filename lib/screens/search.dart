@@ -46,9 +46,6 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Pluks'),
-      ),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -112,7 +109,7 @@ openChatRoomAndStartConversation({BuildContext context, String userName}) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ConversationScreen(chatRoomId: chatRoomId),
+        builder: (context) => ConversationScreen(chatRoomId: chatRoomId, recipientName: userName),
       ),
     );
   }

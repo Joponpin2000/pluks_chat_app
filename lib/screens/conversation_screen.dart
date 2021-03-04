@@ -4,8 +4,8 @@ import 'package:pluks_chat_app/shared/constants.dart';
 
 class ConversationScreen extends StatefulWidget {
   final String chatRoomId;
-
-  ConversationScreen({this.chatRoomId});
+  final String recipientName;
+  ConversationScreen({this.chatRoomId, this.recipientName});
 
   @override
   _ConversationScreenState createState() => _ConversationScreenState();
@@ -63,53 +63,86 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pluks'),
+        title: Text(widget.recipientName),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.search),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.more_vert),
+          ),
+        ],
       ),
       body: Container(
-        child: Stack(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            Container(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                color: Theme.of(context).accentColor,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        controller: messageController,
-                        decoration: InputDecoration(
-                          hintText: 'Message...',
-                          border: InputBorder.none,
+            Expanded(
+              child: SizedBox(
+                child: Container(
+                  height: 200,
+                  margin: EdgeInsets.only(
+                    left: 15,
+                    right: 10,
+                    bottom: 15,
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        height: 200,
+                        margin: EdgeInsets.only(
+                          right: 3,
+                        ),
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          padding: EdgeInsets.only(
+                            left: 10,
+                            top: 5,
+                            bottom: 5,
+                          ),
+                          child: TextField(
+                            controller: messageController,
+                            decoration: InputDecoration(
+                              hintText: 'Type a message...',
+                              hintStyle: TextStyle(
+                                color: Colors.black,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        sendMessage();
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        child: Icon(
-                          Icons.send,
-                          color: Theme.of(context).accentColor,
+                      GestureDetector(
+                        onTap: () {
+                          sendMessage();
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          child: Icon(
+                            Icons.send,
+                            color: Theme.of(context).accentColor,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-            chatMessageList(),
+            Expanded(child: SizedBox(height: 200, child: chatMessageList())),
           ],
         ),
       ),

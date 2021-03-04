@@ -6,19 +6,17 @@ import 'package:pluks_chat_app/services/database.dart';
 import 'package:pluks_chat_app/shared/constants.dart';
 import 'package:pluks_chat_app/shared/helper_functions.dart';
 
-class ChatScreen extends StatefulWidget {
-  ChatScreen({Key key}) : super(key: key);
+class ChatsScreen extends StatefulWidget {
+  ChatsScreen({Key key}) : super(key: key);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _ChatsScreenState createState() => _ChatsScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatsScreenState extends State<ChatsScreen> {
   AuthClass authClass = new AuthClass();
   DatabaseClass databaseClass = new DatabaseClass();
-
   Stream chatRoomsStream;
-
   Widget chatRoomList() {
     return StreamBuilder(
       stream: chatRoomsStream,
@@ -28,11 +26,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: snapshot.data.docs.length,
                 itemBuilder: (context, index) {
                   return ChatRoomTile(
-                    userName: snapshot.data.docs[index].data["chatRoomId"]
+                    userName: snapshot.data.docs[index]
+                        .data()["chatRoomId"]
                         .toString()
                         .replaceAll("_", "")
                         .replaceAll(Constants.myName, ""),
-                    chatRoomId: snapshot.data.docs[index].data["chatRoomId"],
+                    chatRoomId: snapshot.data.docs[index].data()["chatRoomId"],
                   );
                 },
               )
@@ -59,33 +58,15 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Pluks'),
-        actions: <Widget>[
-          FlatButton.icon(
-            onPressed: () async {
-              await authClass.signOut();
-            },
-            icon: Icon(Icons.exit_to_app),
-            label: Text('Logout'),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
           ),
-        ],
-      ),
-      body: chatRoomList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SearchScreen(),
-            ),
-          );
-        },
-        child: Icon(
-          Icons.search,
         ),
-        backgroundColor: Theme.of(context).accentColor,
-        tooltip: 'Search',
+        child: chatRoomList(),
       ),
     );
   }
@@ -108,37 +89,30 @@ class ChatRoomTile extends StatelessWidget {
           ),
         );
       },
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        child: Card(
-          margin: EdgeInsets.fromLTRB(20, 6, 20, 0),
-          child: ListTile(
-            leading: CircleAvatar(
-              radius: 25,
-              child: Text("${userName.substring(0, 1).toUpperCase()}"),
-            ),
-            title: Text(userName),
-            trailing: GestureDetector(
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: GestureDetector(
               onTap: () {
                 openChatRoomAndStartConversation(
                     context: context, userName: userName);
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
-                  borderRadius: BorderRadius.circular(30),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  radius: 25,
+                  child: Text("${userName.substring(0, 1).toUpperCase()}"),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Text(
-                  'Message',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
+                title: Text(userName),
               ),
             ),
           ),
-        ),
+          Container(
+            color: Colors.black,
+            height: 0.2,
+          ),
+        ],
       ),
     );
   }

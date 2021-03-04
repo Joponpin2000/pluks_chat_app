@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:pluks_chat_app/screens/chat_screen.dart';
 import 'package:pluks_chat_app/services/auth.dart';
@@ -14,11 +15,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
   bool isLoading = false;
   final _key = GlobalKey<FormState>();
-
   AuthClass authClass = new AuthClass();
   final DatabaseClass databaseClass = new DatabaseClass();
+  bool _obscureText = true;
 
   QuerySnapshot snapshotUserInfo;
 
@@ -26,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
 
-  login() {
+  login() async {
     if (_key.currentState.validate()) {
       HelperFunctions.saveUserEmailSharedPreference(emailController.text);
 
@@ -42,22 +44,53 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = true;
       });
 
-      authClass
-          .loginWithEmailAndPassword(
-              emailController.text, passwordController.text)
-          .then(
-        (value) {
-          if (value != null) {
-            HelperFunctions.saveUserLoggedInSharedPreference(true);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(),
-              ),
-            );
+      try {
+        auth.UserCredential result = await _auth.signInWithEmailAndPassword(
+            email: emailController.text, password: passwordController.text);
+        auth.User firebaseUser = result.user;
+
+        AuthClass().userFromFirebaseUser(firebaseUser);
+        // Save user info to shared preference
+        HelperFunctions.saveUserLoggedInSharedPreference(true);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatsScreen(),
+          ),
+        );
+      } catch (e) {
+        setState(() {
+          switch (e.code) {
+            case "ERROR_INVALID_EMAIL":
+            case "invalid-email":
+              error = "Email address is invalid.";
+              break;
+            case "ERROR_WRONG_PASSWORD":
+            case "wrong-password":
+              error = "Wrong email/password combination.";
+              break;
+            case "ERROR_USER_NOT_FOUND":
+            case "user-not-found":
+              error = "No user found with this email.";
+              break;
+            case "ERROR_USER_DISABLED":
+            case "user-disabled":
+              error = "User account disabled.";
+              break;
+            case "ERROR_TOO_MANY_REQUESTS":
+              error = "Too many requests, try again later.";
+              break;
+            case "ERROR_OPERATION_NOT_ALLOWED":
+            case "operation-not-allowed":
+              error = "Server error, please try again later.";
+              break;
+            default:
+              error = "Login failed. Please try again.";
+              break;
           }
-        },
-      );
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -93,13 +126,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 10),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          error,
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
+                      error.isNotEmpty
+                          ? Container(
+                              padding: EdgeInsets.all(8),
+                              color: Colors.orangeAccent,
+                              child: Center(
+                                child: Text(
+                                  error,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            )
+                          : Container(),
                       SizedBox(height: 12),
                       Form(
                         key: _key,
@@ -116,10 +154,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                     : "Please provide a valid Email";
                               },
                             ),
-                            SizedBox(height: 30),
+                            SizedBox(height: 5),
                             TextFormField(
-                              decoration: InputDecoration(hintText: 'Password'),
-                              obscureText: true,
+                              decoration: InputDecoration(hintText: 'Password',
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscureText
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),color: Theme.of(context).primaryColor,onPressed: () {
+                                      setState(() {
+                                        _obscureText  =  !_obscureText;
+                                      });
+                                    },
+                                  ),),
+                              obscureText: _obscureText,
                               controller: passwordController,
                               validator: (value) => value.length < 6
                                   ? 'Password should be 6+ chars long'

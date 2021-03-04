@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:pluks_chat_app/screens/Layout.dart';
 import 'package:pluks_chat_app/shared/helper_functions.dart';
 import 'package:pluks_chat_app/authenticate/authenticate.dart';
 import 'package:pluks_chat_app/screens/chat_screen.dart';
@@ -24,8 +25,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   getLoggedInState() async {
-    await HelperFunctions.getUserLoggedInSharedPreference()
-        .then((value) => null);
+    await HelperFunctions.getUserLoggedInSharedPreference().then((value) => {
+          if (value)
+            {
+              setState(() {
+                userIsLoggedIn = true;
+              })
+            }
+        });
   }
 
   @override
@@ -34,12 +41,11 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Pluks',
       theme: ThemeData(
-        // primarySwatch: Colors.grey[300],
-        primaryColor: Colors.grey[700],
-        accentColor: Colors.black87,
+        primaryColor: Color(0xff123456),
+        accentColor: Colors.white70,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: userIsLoggedIn ? ChatScreen() : Authenticate(),
+      home: userIsLoggedIn ? Layout() : Authenticate(),
     );
   }
 }

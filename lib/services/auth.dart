@@ -4,7 +4,7 @@ import 'package:pluks_chat_app/models/user.dart';
 class AuthClass {
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
 
-  User _userFromFirebaseUser(auth.User user) {
+  User userFromFirebaseUser(auth.User user) {
     if (user != null) {
       return User(id: user.uid);
     } else {
@@ -20,10 +20,10 @@ class AuthClass {
 
       // Save user info to shared preference
 
-      return _userFromFirebaseUser(firebaseUser);
+      return userFromFirebaseUser(firebaseUser);
     } catch (e) {
-      print(e.toString());
-      return null;
+      String errorMessage = e.toString();
+      return errorMessage;
     }
   }
 
@@ -33,7 +33,7 @@ class AuthClass {
           email: email, password: password);
       auth.User firebaseUser = result.user;
 
-      return _userFromFirebaseUser(firebaseUser);
+      return userFromFirebaseUser(firebaseUser);
     } catch (e) {
       print(e.toString());
       return null;

@@ -9,20 +9,20 @@ class HelperFunctions {
 
   static Future<bool> saveUserLoggedInSharedPreference(
       bool isUserLoggedIn) async {
-    SharedPreferences prefs =
-        SharedPreferences.getInstance() as SharedPreferences;
+    SharedPreferences prefs =await
+        SharedPreferences.getInstance();
     return await prefs.setBool(sharedPreferenceUserLoggedInKey, isUserLoggedIn);
   }
 
   static Future<bool> saveUserNameSharedPreference(String userName) async {
-    SharedPreferences prefs =
-        SharedPreferences.getInstance() as SharedPreferences;
+    SharedPreferences prefs =await
+        SharedPreferences.getInstance();
     return await prefs.setString(sharedPreferenceUserNameKey, userName);
   }
 
   static Future<bool> saveUserEmailSharedPreference(String userEmail) async {
-    SharedPreferences prefs =
-        SharedPreferences.getInstance() as SharedPreferences;
+    SharedPreferences prefs =await
+        SharedPreferences.getInstance();
     return await prefs.setString(sharedPreferenceUserEmailKey, userEmail);
   }
 
