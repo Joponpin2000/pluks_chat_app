@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pluks_chat_app/screens/chat_screen.dart';
+import 'package:pluks_chat_app/screens/Layout.dart';
 import 'package:pluks_chat_app/services/auth.dart';
 import 'package:pluks_chat_app/services/database.dart';
 import 'package:pluks_chat_app/shared/helper_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:pluks_chat_app/shared/shared.dart';
 
 class SignUpScreen extends StatefulWidget {
   final Function toggleView;
@@ -30,40 +31,59 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   register() async {
     if (_key.currentState.validate()) {
-      Map<String, String> userMap = {
-        "name": usernameController.text,
-        "email": emailController.text,
-      };
-      HelperFunctions.saveUserEmailSharedPreference(emailController.text);
-      HelperFunctions.saveUserNameSharedPreference(usernameController.text);
-
       setState(() {
         isLoading = true;
       });
-
       try {
-        auth.UserCredential result = await _auth.createUserWithEmailAndPassword(
-            email: emailController.text, password: usernameController.text);
-        auth.User firebaseUser = result.user;
+        await _auth
+            .createUserWithEmailAndPassword(
+                email: emailController.text.trim(),
+                password: usernameController.text.trim())
+            .then((value) async {
+          auth.User firebaseUser = value.user;
 
-        AuthClass().userFromFirebaseUser(firebaseUser);
-        await databaseClass.uploadUserInfo(userMap);
+          Map<String, String> userMap = {
+            "id": firebaseUser.uid,
+            "name": usernameController.text.capitalize(),
+            "email": emailController.text,
+            "city": "Lagos",
+            "country": "Nigeria",
+          };
+          HelperFunctions.saveUserIdSharedPreference(firebaseUser.uid);
+          HelperFunctions.saveUserEmailSharedPreference(emailController.text.trim());
+          HelperFunctions.saveUserNameSharedPreference(usernameController.text.capitalize());
+          HelperFunctions.saveUserCountrySharedPreference("Nigeria");
+          HelperFunctions.saveUserCitySharedPreference("Lagos");
 
-        // Save user info to shared preference
-        HelperFunctions.saveUserLoggedInSharedPreference(true);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatsScreen(),
-          ),
-        );
+          print(firebaseUser.uid);
+          AuthClass().userFromFirebaseUser(firebaseUser);
+          await databaseClass.uploadUserInfo(firebaseUser.uid, userMap);
+
+          // Save user info to shared preference
+          HelperFunctions.saveUserLoggedInSharedPreference(true);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Layout(),
+            ),
+          );
+        });
       } catch (e) {
         setState(() {
           switch (e.code) {
             case "ERROR_INVALID_EMAIL":
+            case "weak-password":
+              error = "Password is too weak.";
+              break;
+
             case "invalid-email":
               error = "Email address is invalid.";
               break;
+            case "EMAIL_ALREADY_IN_USE":
+            case "email-already-in-use":
+              error = "Email already exist.";
+              break;
+
             case "ERROR_TOO_MANY_REQUESTS":
               error = "Too many requests, try again later.";
               break;
@@ -77,6 +97,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
           }
           isLoading = false;
         });
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(
+                "Error",
+                style: TextStyle(
+                  color: Colors.orange,
+                ),
+              ),
+              content: Text(error.toString()),
+            );
+          },
+        );
       }
     }
   }
@@ -87,7 +121,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: isLoading
           ? Container(
               child: Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
               ),
             )
           : SafeArea(
@@ -105,32 +141,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 10),
-                      error.isNotEmpty
-                          ? Container(
-                              padding: EdgeInsets.all(8),
-                              color: Colors.orangeAccent,
-                              child: Center(
-                                child: Text(
-                                  error,
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            )
-                          : Container(),
                       SizedBox(height: 12),
                       Form(
                         key: _key,
                         child: Column(
                           children: <Widget>[
-                            TextFormField(
-                              decoration: InputDecoration(hintText: 'Username'),
-                              controller: usernameController,
-                              validator: (value) => value == ''
-                                  ? 'Username can\'t be empty'
-                                  : null,
-                            ),
-                            SizedBox(height: 5),
                             TextFormField(
                               decoration: InputDecoration(hintText: 'Email'),
                               controller: emailController,
@@ -141,6 +156,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ? null
                                     : "Please provide a valid Email";
                               },
+                            ),
+                            SizedBox(height: 5),
+                            TextFormField(
+                              decoration: InputDecoration(hintText: 'Username'),
+                              controller: usernameController,
+                              validator: (value) => value == ''
+                                  ? 'Username can\'t be empty'
+                                  : null,
                             ),
                             SizedBox(height: 5),
                             TextFormField(
@@ -191,6 +214,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           widget.toggleView();
                         },
                         child: Container(
+                          
                           alignment: Alignment.center,
                           child: Row(
                             children: <Widget>[
@@ -200,16 +224,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   color: Theme.of(context).primaryColor,
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: widget.toggleView,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 5),
-                                  child: Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      color: Theme.of(context).accentColor,
-                                    ),
+                              SizedBox(width: 5),
+                              RaisedButton(
+                                
+                                onPressed: widget.toggleView,
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                 ),
                               ),

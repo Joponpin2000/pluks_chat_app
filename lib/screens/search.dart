@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pluks_chat_app/screens/conversation_screen.dart';
 import 'package:pluks_chat_app/services/database.dart';
+import 'package:pluks_chat_app/shared/SearchTile.dart';
 import 'package:pluks_chat_app/shared/constants.dart';
 import 'package:pluks_chat_app/shared/shared.dart';
 
@@ -18,14 +19,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
+    initiateSearch();
     super.initState();
   }
 
   initiateSearch() {
-    databaseClass.getUserByUsername(searchController.text).then((val) {
-      setState(() {
-        searchSnapshot = val;
-      });
+    databaseClass.getUsers().then((val) {
+      if (mounted) {
+        setState(() {
+          searchSnapshot = val;
+        });
+      }
     });
   }
 
@@ -35,122 +39,59 @@ class _SearchScreenState extends State<SearchScreen> {
             shrinkWrap: true,
             itemCount: searchSnapshot.docs.length,
             itemBuilder: (context, index) {
-              return SearchTile(
-                userName: searchSnapshot.docs[index].data()['name'],
-              );
+              return searchSnapshot.docs[index].data()['name'] !=
+                      Constants.myName
+                  ? SearchTile(
+                      userData: searchSnapshot.docs[index].data(),
+                    )
+                  : Container();
             },
           )
-        : Container();
+        : Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
+          );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       body: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              color: Colors.white,
-              padding: EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 16,
-              ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search..',
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      initiateSearch();
-                    },
-                    child: Container(
-                      height: 40,
-                      width: 40,
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: Icon(
-                        Icons.search,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            searchList(),
-          ],
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
+          ),
         ),
+        child: searchList(),
       ),
     );
   }
 }
 
-openChatRoomAndStartConversation({BuildContext context, String userName}) {
-  if (userName != Constants.myName) {
-    String chatRoomId = getChatRoomId(userName, Constants.myName);
+openChatRoomAndStartConversation({BuildContext context, String recipientName, String recipientImageUrl}) {
+  if (recipientName != Constants.myName) {
+    String chatRoomId = getChatRoomId([recipientName, Constants.myName]);
 
-    List<String> users = [userName, Constants.myName];
+    List<String> users = [recipientName, Constants.myName];
     Map<String, dynamic> chatRoomMap = {
       "users": users,
       "chatRoomId": chatRoomId,
     };
 
-    DatabaseClass().createChatRoom(chatRoomId, chatRoomMap);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ConversationScreen(chatRoomId: chatRoomId, recipientName: userName),
-      ),
-    );
-  }
-}
-
-class SearchTile extends StatelessWidget {
-  final String userName;
-
-  SearchTile({this.userName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      child: Card(
-        margin: EdgeInsets.fromLTRB(20, 6, 20, 0),
-        child: ListTile(
-          leading: CircleAvatar(
-            radius: 25,
-            child: Text("${userName.substring(0, 1).toUpperCase()}"),
-          ),
-          title: Text(userName),
-          trailing: GestureDetector(
-            onTap: () {
-              openChatRoomAndStartConversation(
-                  context: context, userName: userName);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Text(
-                'Message',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
+        builder: (context) => ConversationScreen(
+          chatRoomId: chatRoomId,
+          isFirstChat: true,
+          chatRoomMap: chatRoomMap,
+          recipientImageUrl: recipientImageUrl,
+          recipientName: recipientName,
         ),
       ),
     );

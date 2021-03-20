@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
-import 'package:pluks_chat_app/screens/chat_screen.dart';
+import 'package:pluks_chat_app/screens/Layout.dart';
+import 'package:pluks_chat_app/authenticate/ForgotPassword.dart';
 import 'package:pluks_chat_app/services/auth.dart';
 import 'package:pluks_chat_app/services/database.dart';
 import 'package:pluks_chat_app/shared/helper_functions.dart';
@@ -22,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final DatabaseClass databaseClass = new DatabaseClass();
   bool _obscureText = true;
 
-  QuerySnapshot snapshotUserInfo;
+  dynamic snapshotUserInfo;
 
   String error = '';
   TextEditingController emailController = new TextEditingController();
@@ -30,35 +30,48 @@ class _LoginScreenState extends State<LoginScreen> {
 
   login() async {
     if (_key.currentState.validate()) {
-      HelperFunctions.saveUserEmailSharedPreference(emailController.text);
-
-      databaseClass.getUserByEmail(emailController.text).then(
-        (val) {
-          snapshotUserInfo = val;
-          HelperFunctions.saveUserNameSharedPreference(
-              snapshotUserInfo.docs[0].data()['name']);
-        },
-      );
-
       setState(() {
         isLoading = true;
       });
-
       try {
-        auth.UserCredential result = await _auth.signInWithEmailAndPassword(
-            email: emailController.text, password: passwordController.text);
-        auth.User firebaseUser = result.user;
+        await _auth
+            .signInWithEmailAndPassword(
+                email: emailController.text.trim(),
+                password: passwordController.text.trim())
+            .then(
+          (value) {
+            auth.User firebaseUser = value.user;
+            AuthClass().userFromFirebaseUser(firebaseUser);
 
-        AuthClass().userFromFirebaseUser(firebaseUser);
-        // Save user info to shared preference
-        HelperFunctions.saveUserLoggedInSharedPreference(true);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatsScreen(),
-          ),
+            databaseClass.getUserByEmail(firebaseUser.email).then((val) async {
+              snapshotUserInfo = val;
+
+              HelperFunctions.saveUserNameSharedPreference(
+                  snapshotUserInfo.docs[0].data()['name']);
+
+              HelperFunctions.saveUserIdSharedPreference(
+                  snapshotUserInfo.docs[0].data()['id']);
+              // Save user info to shared preference
+              HelperFunctions.saveUserLoggedInSharedPreference(true);
+              HelperFunctions.saveUserCountrySharedPreference(
+                  snapshotUserInfo.docs[0].data()['country']);
+              HelperFunctions.saveUserCitySharedPreference(
+                  snapshotUserInfo.docs[0].data()['city']);
+              HelperFunctions.saveUserImageUrlSharedPreference(
+                  snapshotUserInfo.docs[0].data()['imageUrl']);
+              HelperFunctions.saveUserEmailSharedPreference(
+                  snapshotUserInfo.docs[0].data()['email']);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Layout(),
+                ),
+              );
+            });
+          },
         );
       } catch (e) {
+        isLoading = false;
         setState(() {
           switch (e.code) {
             case "ERROR_INVALID_EMAIL":
@@ -88,8 +101,21 @@ class _LoginScreenState extends State<LoginScreen> {
               error = "Login failed. Please try again.";
               break;
           }
-          isLoading = false;
         });
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(
+                "Error",
+                style: TextStyle(
+                  color: Colors.orange,
+                ),
+              ),
+              content: Text(error.toString()),
+            );
+          },
+        );
       }
     }
   }
@@ -100,11 +126,12 @@ class _LoginScreenState extends State<LoginScreen> {
       body: isLoading
           ? Container(
               child: Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
               ),
             )
           : SafeArea(
-              top: true,
               child: SingleChildScrollView(
                 child: Container(
                   padding: EdgeInsets.fromLTRB(30, 50, 30, 0),
@@ -125,20 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 10),
-                      error.isNotEmpty
-                          ? Container(
-                              padding: EdgeInsets.all(8),
-                              color: Colors.orangeAccent,
-                              child: Center(
-                                child: Text(
-                                  error,
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            )
-                          : Container(),
-                      SizedBox(height: 12),
+                      SizedBox(height: 15),
                       Form(
                         key: _key,
                         child: Column(
@@ -156,18 +170,22 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             SizedBox(height: 5),
                             TextFormField(
-                              decoration: InputDecoration(hintText: 'Password',
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscureText
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                    ),color: Theme.of(context).primaryColor,onPressed: () {
-                                      setState(() {
-                                        _obscureText  =  !_obscureText;
-                                      });
-                                    },
-                                  ),),
+                              decoration: InputDecoration(
+                                hintText: 'Password',
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  color: Theme.of(context).primaryColor,
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                ),
+                              ),
                               obscureText: _obscureText,
                               controller: passwordController,
                               validator: (value) => value.length < 6
@@ -181,43 +199,50 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ForgotPassword(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                'Forgot Password?',
+                                style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: 50),
-                      GestureDetector(
-                        onTap: () {
+                      RaisedButton(
+                        onPressed: () {
                           login();
                         },
-                        child: Container(
-                          alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width,
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          color: Theme.of(context).primaryColor,
-                          child: Text(
-                            'Login',
-                            style: TextStyle(color: Colors.white),
+                        color: Theme.of(context).primaryColor,
+                        child: Text(
+                          'Login',
+                          style: TextStyle(
+                            color: Theme.of(context).accentColor,
                           ),
                         ),
                       ),
                       SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          widget.toggleView();
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          child: Text(
-                            'Create Account',
-                            style: TextStyle(
-                              color: Theme.of(context).accentColor,
+                      Center(
+                        child: GestureDetector(
+                          onTap: widget.toggleView,
+                          child: Container(
+                            child: Text(
+                              'Create Account',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
                             ),
                           ),
                         ),

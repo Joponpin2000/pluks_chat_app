@@ -1,6 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseClass {
+  getUsers() async {
+    return await FirebaseFirestore.instance
+        .collection('users')
+        .orderBy("name", descending: false)
+        .get();
+  }
+
   getUserByUsername(String username) async {
     return await FirebaseFirestore.instance
         .collection('users')
@@ -8,24 +15,25 @@ class DatabaseClass {
         .get();
   }
 
-  getUserByEmail(String userEmail) async {
+  Future getUserByEmail(String userEmail) async {
     return await FirebaseFirestore.instance
         .collection('users')
         .where("email", isEqualTo: userEmail)
         .get();
   }
 
-  uploadUserInfo(userMap) async {
+  uploadUserInfo(userId, userMap) async {
     await FirebaseFirestore.instance
         .collection('users')
-        .add(userMap)
+        .doc(userId)
+        .set(userMap)
         .catchError((e) {
       print(e.toString());
     });
   }
 
-  createChatRoom(String chatRoomId, chatRoomMap) {
-    FirebaseFirestore.instance
+  createChatRoom(String chatRoomId, chatRoomMap) async {
+    await FirebaseFirestore.instance
         .collection("ChatRoom")
         .doc(chatRoomId)
         .set(chatRoomMap)
@@ -36,12 +44,13 @@ class DatabaseClass {
     );
   }
 
-  addConversationMessages(String chatRoomId, messageMap) {
-    FirebaseFirestore.instance
+  addConversationMessages(String chatRoomId, messageMap) async {
+    await FirebaseFirestore.instance
         .collection("ChatRoom")
         .doc(chatRoomId)
         .collection("chats")
         .add(messageMap)
+        .then((value) => print("true"))
         .catchError(
       (e) {
         print(e.toString());

@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:pluks_chat_app/screens/Layout.dart';
-import 'package:pluks_chat_app/shared/helper_functions.dart';
 import 'package:pluks_chat_app/authenticate/authenticate.dart';
-import 'package:pluks_chat_app/screens/chat_screen.dart';
+import 'package:pluks_chat_app/screens/Layout.dart';
+import 'package:pluks_chat_app/screens/PageView.dart';
+import 'package:pluks_chat_app/shared/helper_functions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +17,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool isFreshInstall = true;
   bool userIsLoggedIn = false;
   @override
   void initState() {
@@ -25,27 +26,43 @@ class _MyAppState extends State<MyApp> {
   }
 
   getLoggedInState() async {
-    await HelperFunctions.getUserLoggedInSharedPreference().then((value) => {
-          if (value)
-            {
-              setState(() {
-                userIsLoggedIn = true;
-              })
-            }
-        });
+    await HelperFunctions.getAppFreshInstallSharedPreference().then(
+      (value) async => {
+        if (value != null && value == false)
+          {
+            setState(() {
+              isFreshInstall = false;
+            })
+          },
+        await HelperFunctions.getUserLoggedInSharedPreference().then(
+          (value) => {
+            if (value != null && value == true)
+              {
+                setState(() {
+                  userIsLoggedIn = true;
+                })
+              }
+          },
+        ),
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Pluks',
+      title: 'Chatter',
       theme: ThemeData(
         primaryColor: Color(0xff123456),
         accentColor: Colors.white70,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: userIsLoggedIn ? Layout() : Authenticate(),
+      home: isFreshInstall
+          ? OnBoardingPageView()
+          : userIsLoggedIn
+              ? Layout()
+              : Authenticate(),
     );
   }
 }
