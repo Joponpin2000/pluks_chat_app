@@ -137,13 +137,11 @@ class ChatRoomTile extends StatelessWidget {
                       ? Icon(Icons.person)
                       : userData['imageUrl'].isNotEmpty
                           ? FullScreenWidget(
-                              child: Center(
-                                child: Hero(
-                                  tag: userData['imageUrl'].toString(),
-                                  child: CachedNetworkImage(
-                                    imageUrl: userData['imageUrl'],
-                                    fit: BoxFit.fill,
-                                  ),
+                              child: Hero(
+                                tag: userData['imageUrl'].toString(),
+                                child: CachedNetworkImage(
+                                  imageUrl: userData['imageUrl'],
+                                  fit: BoxFit.fill,
                                 ),
                               ),
                             )

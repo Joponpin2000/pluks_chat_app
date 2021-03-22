@@ -238,31 +238,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     width: 140,
                                     height: 140,
                                     child: (userImageUrl == null)
-                                        ? Image.asset(
-                                            "assets/d-p.png",
-                                            fit: BoxFit.fill,
-                                          )
+                                        ? Icon(Icons.person)
                                         : userImageUrl.isNotEmpty
                                             ? FullScreenWidget(
-                                                child: Center(
-                                                  child: Hero(
-                                                    tag:
-                                                        userImageUrl.toString(),
-                                                    child: CachedNetworkImage(
-                                                          imageUrl:
-                                                              userImageUrl,
-                                                          fit: BoxFit.fill,
-                                                        ) ??
-                                                        Center(
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            backgroundColor:
-                                                                Theme.of(
-                                                                        context)
-                                                                    .primaryColor,
-                                                          ),
+                                                child: Hero(
+                                                  tag: userImageUrl.toString(),
+                                                  child: CachedNetworkImage(
+                                                        imageUrl: userImageUrl,
+                                                        fit: BoxFit.fill,
+                                                      ) ??
+                                                      Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          backgroundColor:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
                                                         ),
-                                                  ),
+                                                      ),
                                                 ),
                                               )
                                             : Center(

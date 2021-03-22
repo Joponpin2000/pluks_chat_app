@@ -30,21 +30,19 @@ class SearchTile extends StatelessWidget {
                     ? Icon(Icons.person)
                     : userData['imageUrl'].isNotEmpty
                         ? FullScreenWidget(
-                            child: Center(
-                              child: Hero(
-                                tag: userData['imageUrl'].toString(),
-                                child: CachedNetworkImage(
-                                  imageUrl: userData['imageUrl'],
-                                  placeholder: (context, url) => Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor,
-                                    ),
+                            child: Hero(
+                              tag: userData['imageUrl'].toString(),
+                              child: CachedNetworkImage(
+                                imageUrl: userData['imageUrl'],
+                                placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator(
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
                                   ),
-                                  errorWidget: (context, url, err) =>
-                                      Icon(Icons.person),
-                                  fit: BoxFit.fill,
                                 ),
+                                errorWidget: (context, url, err) =>
+                                    Icon(Icons.person),
+                                fit: BoxFit.fill,
                               ),
                             ),
                           )

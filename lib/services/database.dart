@@ -50,7 +50,6 @@ class DatabaseClass {
         .doc(chatRoomId)
         .collection("chats")
         .add(messageMap)
-        .then((value) => print("true"))
         .catchError(
       (e) {
         print(e.toString());

@@ -88,7 +88,7 @@ class _OnBoardingPageViewState extends State<OnBoardingPageView> {
                               ),
                               SizedBox(height: 20),
                               Text(
-                                "Fast messaging and fast delivery",
+                                "Fast messaging",
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 18,

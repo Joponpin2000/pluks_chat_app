@@ -23,6 +23,7 @@ class ConversationScreen extends StatefulWidget {
 class _ConversationScreenState extends State<ConversationScreen> {
   DatabaseClass databaseClass = new DatabaseClass();
   TextEditingController messageController = new TextEditingController();
+  TextEditingController emojiMessageController = new TextEditingController();
   Stream chatMessageStream;
 
   Widget chatMessageList() {
@@ -68,6 +69,23 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
   }
 
+  sendEmojiMessage() async {
+    if (emojiMessageController.text.isNotEmpty) {
+      Map<String, dynamic> messageMap = {
+        "message": emojiMessageController.text.trim(),
+        "sendBy": Constants.myName,
+        "time": DateTime.now().millisecondsSinceEpoch,
+      };
+      emojiMessageController.text = "";
+      if (widget.isFirstChat) {
+        await databaseClass.createChatRoom(
+            widget.chatRoomId, widget.chatRoomMap);
+      }
+      await databaseClass.addConversationMessages(
+          widget.chatRoomId, messageMap);
+    }
+  }
+
   @override
   void initState() {
     databaseClass.getConversationMessages(widget.chatRoomId).then((value) {
@@ -101,15 +119,69 @@ class _ConversationScreenState extends State<ConversationScreen> {
       showModalBottomSheet(
           context: context,
           builder: (context) {
-            return GridView.builder(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: HelperFunctions().emojis.length,
-              gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 8),
-              itemBuilder: (context, index) => emojiItem(
-                item: HelperFunctions().emojis[index],
-              ),
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: EdgeInsets.only(
+                          left: 10,
+                          top: 5,
+                          bottom: 5,
+                        ),
+                        child: TextField(
+                          controller: emojiMessageController,
+                          onChanged: (value) {
+                            setState(() {
+                              emojiMessageController.text = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintStyle: TextStyle(
+                              color: Colors.black,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // SizedBox(width: 2),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      child: GestureDetector(
+                        onTap: () {
+                          sendEmojiMessage();
+                        },
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Theme.of(context).primaryColor,
+                          child: Icon(
+                            Icons.send,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                GridView.builder(
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: HelperFunctions().emojis.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 8),
+                  itemBuilder: (context, index) => emojiItem(
+                    item: HelperFunctions().emojis[index],
+                  ),
+                ),
+              ],
             );
           });
     }

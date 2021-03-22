@@ -9,13 +9,14 @@ class HelperFunctions {
   static String sharedPreferenceUserCityKey = "USERCITYKEY";
   static String sharedPreferenceUserIdKey = "USERIDKEY";
   static String sharedPreferenceUserImageUrlKey = "USERIMAGEURLKEY";
-  
+
   // Save data to shared preference
 
   static Future<bool> saveAppFreshInstallSharedPreference(
       bool isFreshInstall) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return await prefs.setBool(sharedPreferenceAppFreshInstallKey, isFreshInstall);
+    return await prefs.setBool(
+        sharedPreferenceAppFreshInstallKey, isFreshInstall);
   }
 
   static Future<bool> saveUserLoggedInSharedPreference(
@@ -161,37 +162,21 @@ class HelperFunctions {
     "😡",
     "😠",
     "😇",
-    "🥳",
     "🤠",
     "🤡",
     "🧐",
-    "👽",
-    "👹",
     "🙈",
     "🙉",
     "🙊",
     "👁",
     "👀",
-    "👥",
-    "🦴",
     "👅",
     "👄",
     "🦾",
-    "🤼‍♀️",
     "💑",
     "👨‍❤️‍👨",
-    "👩‍👩‍👦",
-    "👨‍👨‍👧‍👧",
-    "👩‍👩‍👦‍👦",
     "👩",
     "👨",
-    "🧑",
-    "👧",
-    "👦",
-    "🧒",
-    "👩‍🦱",
-    "👨‍🦱",
-    "👩‍🦲",
     "🤴",
     "👩‍💻",
     "👨‍🏭",
@@ -208,21 +193,14 @@ class HelperFunctions {
     "⛹️‍♂️",
     "⛹️‍♀️",
     "🚴‍♂️",
-    "🚵‍♂️",
     "🤸‍♀️",
     "🤸‍♂️",
     "🤳",
     "💪",
-    "👂",
-    "👃",
-    "🤏",
     "👈",
     "👉",
     "☝",
     "🖐",
-    "🤙",
-    "🤘",
-    "🖖",
     "🤞",
     "✌",
     "👇",
@@ -239,19 +217,14 @@ class HelperFunctions {
     "👐",
     "🙌",
     "👏",
-    "✍",
     "🤟",
     "👋",
     "🤚",
     "🙏",
     "🤝",
-    "💅",
     "🎈",
     "🎊",
     "🎉",
     "✨",
-    "🎗",
-    "🎁",
-    "🎏"
   ];
 }
