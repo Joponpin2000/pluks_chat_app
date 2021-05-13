@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Chatter',
+      title: 'Chat-a-long',
       theme: ThemeData(
         primaryColor: Color(0xff123456),
         accentColor: Colors.white70,

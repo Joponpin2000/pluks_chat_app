@@ -38,7 +38,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         await _auth
             .createUserWithEmailAndPassword(
                 email: emailController.text.trim(),
-                password: usernameController.text.trim())
+                password: passwordController.text.trim())
             .then((value) async {
           auth.User firebaseUser = value.user;
 

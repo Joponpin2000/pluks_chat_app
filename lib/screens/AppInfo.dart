@@ -24,7 +24,7 @@ class AppInfoScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 15),
                 Text(
-                  "Chatter",
+                  "Chat-a-long",
                   style: TextStyle(fontSize: 26),
                 ),
                 SizedBox(height: 10),

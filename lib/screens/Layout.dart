@@ -26,12 +26,12 @@ class _LayoutState extends State<Layout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(navIndex == 0
+        title: Text(drawerStatus == FSBStatus.FSB_OPEN ? "Menu" : navIndex == 0
             ? "Profile"
             : navIndex == 1
                 ? "Chats"
                 : navIndex == 2
-                    ? "All Users"
+                    ? "People You May Know"
                     : ""),
         leading: GestureDetector(
           onTap: () {

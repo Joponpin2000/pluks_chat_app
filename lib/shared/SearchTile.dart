@@ -26,31 +26,38 @@ class SearchTile extends StatelessWidget {
               leading: CircleAvatar(
                 backgroundColor: Theme.of(context).primaryColor,
                 radius: 25,
-                child: (userData['imageUrl'] == null)
-                    ? Icon(Icons.person)
-                    : userData['imageUrl'].isNotEmpty
-                        ? FullScreenWidget(
-                            child: Hero(
-                              tag: userData['imageUrl'].toString(),
-                              child: CachedNetworkImage(
-                                imageUrl: userData['imageUrl'],
-                                placeholder: (context, url) => Center(
-                                  child: CircularProgressIndicator(
-                                    backgroundColor:
-                                        Theme.of(context).primaryColor,
+                child: ClipOval(
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: (userData['imageUrl'] == null)
+                        ? Icon(Icons.person)
+                        : userData['imageUrl'].isNotEmpty
+                            ? FullScreenWidget(
+                                child: Hero(
+                                  tag: userData['imageUrl'].toString(),
+                                  child: CachedNetworkImage(
+                                    imageUrl: userData['imageUrl'],
+                                    placeholder: (context, url) => Center(
+                                      child: CircularProgressIndicator(
+                                        backgroundColor:
+                                            Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, err) =>
+                                        Icon(Icons.person),
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
-                                errorWidget: (context, url, err) =>
-                                    Icon(Icons.person),
-                                fit: BoxFit.fill,
+                              )
+                            : Center(
+                                child: CircularProgressIndicator(
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
+                                ),
                               ),
-                            ),
-                          )
-                        : Center(
-                            child: CircularProgressIndicator(
-                              backgroundColor: Theme.of(context).primaryColor,
-                            ),
-                          ),
+                  ),
+                ),
               ),
               title: Text(userData['name'].toString()),
               subtitle: Text("${userData['city']}, ${userData['country']}."),

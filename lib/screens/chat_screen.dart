@@ -77,17 +77,53 @@ class _ChatsScreenState extends State<ChatsScreen> {
   }
 }
 
-class ChatRoomTile extends StatelessWidget {
+class ChatRoomTile extends StatefulWidget {
   final userData;
   final String chatRoomId;
+
   ChatRoomTile({this.userData, this.chatRoomId});
+
+  @override
+  _ChatRoomTileState createState() => _ChatRoomTileState();
+}
+
+class _ChatRoomTileState extends State<ChatRoomTile> {
+  DatabaseClass databaseClass = new DatabaseClass();
+  dynamic snapshotUserInfo;
+  String imageUrl;
+  bool isLoading;
+
+  @override
+  void initState() {
+    getUserInfo();
+    super.initState();
+  }
+
+  getUserInfo() async {
+    setState(() {
+      isLoading = true;
+    });
+    databaseClass
+        .getUserByUsername(
+      widget.userData["chatRoomId"]
+          .toString()
+          .replaceAll("_", "")
+          .replaceAll(Constants.myName, ""),
+    )
+        .then((val) {
+      setState(() {
+        isLoading = false;
+        imageUrl = val.docs[0].data()['imageUrl'];
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         List<String> users = [
-          userData["chatRoomId"]
+          widget.userData["chatRoomId"]
               .toString()
               .replaceAll("_", "")
               .replaceAll(Constants.myName, ""),
@@ -95,17 +131,17 @@ class ChatRoomTile extends StatelessWidget {
         ];
         Map<String, dynamic> chatRoomMap = {
           "users": users,
-          "chatRoomId": chatRoomId,
+          "chatRoomId": widget.chatRoomId,
         };
 
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ConversationScreen(
-              chatRoomId: chatRoomId,
+              chatRoomId: widget.chatRoomId,
               isFirstChat: false,
-              recipientImageUrl: userData['imageUrl'],
-              recipientName: userData["chatRoomId"]
+              recipientImageUrl: widget.userData['imageUrl'],
+              recipientName: widget.userData["chatRoomId"]
                   .toString()
                   .replaceAll("_", "")
                   .replaceAll(Constants.myName, ""),
@@ -122,8 +158,8 @@ class ChatRoomTile extends StatelessWidget {
               onTap: () {
                 openChatRoomAndStartConversation(
                   context: context,
-                  recipientImageUrl: userData['imageUrl'],
-                  recipientName: userData["chatRoomId"]
+                  recipientImageUrl: widget.userData['imageUrl'],
+                  recipientName: widget.userData["chatRoomId"]
                       .toString()
                       .replaceAll("_", "")
                       .replaceAll(Constants.myName, ""),
@@ -133,25 +169,31 @@ class ChatRoomTile extends StatelessWidget {
                 leading: CircleAvatar(
                   backgroundColor: Theme.of(context).primaryColor,
                   radius: 25,
-                  child: (userData['imageUrl'] == null)
-                      ? Icon(Icons.person)
-                      : userData['imageUrl'].isNotEmpty
-                          ? FullScreenWidget(
-                              child: Hero(
-                                tag: userData['imageUrl'].toString(),
-                                child: CachedNetworkImage(
-                                  imageUrl: userData['imageUrl'],
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                            )
-                          : Center(
+                  child: ClipOval(
+                    child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: isLoading
+                          ? Center(
                               child: CircularProgressIndicator(
                                 backgroundColor: Theme.of(context).primaryColor,
                               ),
-                            ),
+                            )
+                          : (imageUrl == null || imageUrl.isEmpty)
+                              ? Icon(Icons.person)
+                              : FullScreenWidget(
+                                  child: Hero(
+                                    tag: imageUrl.toString(),
+                                    child: CachedNetworkImage(
+                                      imageUrl: imageUrl,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                    ),
+                  ),
                 ),
-                title: Text(userData["chatRoomId"]
+                title: Text(widget.userData["chatRoomId"]
                     .toString()
                     .replaceAll("_", "")
                     .replaceAll(Constants.myName, "")),

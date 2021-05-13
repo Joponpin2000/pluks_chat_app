@@ -55,7 +55,7 @@ flutter_icons:
   image_path: "assets/icon.png"
 
 flutter_launcher_name:
-  name: "Chatter"
+  name: "Chat-a-long"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

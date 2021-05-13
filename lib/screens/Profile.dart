@@ -96,9 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           );
         });
-      } catch (e) {
-        print(e.toString());
-      }
+      } catch (e) {}
     }
   }
 
@@ -159,6 +157,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     Future uploadFile(BuildContext context) async {
+      setState(() {
+        isLoading = true;
+      });
       String fileName = basename(_image.path);
       StorageReference firebaseStorageRef =
           FirebaseStorage.instance.ref().child(fileName);
@@ -180,6 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         databaseClass.uploadUserInfo(userId, userDataMap);
         HelperFunctions.saveUserImageUrlSharedPreference(userImageUrl);
         setState(() {
+          isLoading = false;
           Scaffold.of(context).showSnackBar(
             SnackBar(
               content: Text("Profile Picture Uploaded"),
@@ -190,14 +192,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     Future getImage(context) async {
-      File image = File(await ImagePicker()
-          .getImage(source: ImageSource.gallery)
-          .then((pickedFile) => pickedFile.path));
+      try {
+        File image = File(await ImagePicker()
+            .getImage(source: ImageSource.gallery)
+            .then((pickedFile) => pickedFile.path));
 
-      setState(() {
-        _image = image;
-      });
-      uploadFile(context);
+        setState(() {
+          _image = image;
+        });
+        uploadFile(context);
+      } catch (e) {}
     }
 
     return Scaffold(
@@ -225,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         alignment: Alignment.center,
                         child: CircleAvatar(
                           radius: 70,
-                          backgroundColor: Colors.grey,
+                          backgroundColor: Theme.of(context).primaryColor,
                           child: isLoading
                               ? Center(
                                   child: CircularProgressIndicator(
@@ -238,7 +242,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     width: 140,
                                     height: 140,
                                     child: (userImageUrl == null)
-                                        ? Icon(Icons.person)
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 120,
+                                          )
                                         : userImageUrl.isNotEmpty
                                             ? FullScreenWidget(
                                                 child: Hero(

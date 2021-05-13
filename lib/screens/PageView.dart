@@ -80,7 +80,7 @@ class _OnBoardingPageViewState extends State<OnBoardingPageView> {
                               ),
                               SizedBox(height: 40),
                               Text(
-                                "Chatter",
+                                "Chat-a-long",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 30,
@@ -94,7 +94,7 @@ class _OnBoardingPageViewState extends State<OnBoardingPageView> {
                                   fontSize: 18,
                                 ),
                               ),
-                              SizedBox(height: 60),
+                              SizedBox(height: 70),
                               GestureDetector(
                                 onTap: () {
                                   toAuth();
@@ -188,7 +188,7 @@ class _OnBoardingPageViewState extends State<OnBoardingPageView> {
                       //         ),
                       //         SizedBox(height: 40),
                       //         Text(
-                      //           "Chatter",
+                      //           "Chat-a-long",
                       //           style: TextStyle(
                       //             color: Colors.white,
                       //             fontSize: 30,
@@ -230,31 +230,31 @@ class _OnBoardingPageViewState extends State<OnBoardingPageView> {
                       // ),
                     ],
                   ),
-                  Positioned(
-                    bottom: 60,
-                    left: 150,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Indicator(
-                          positionIndex: 0,
-                          currentIndex: currentIndex,
-                        ),
-                        // SizedBox(width: 10),
-                        // Indicator(
-                        //   positionIndex: 1,
-                        //   currentIndex: currentIndex,
-                        // ),
-                        // SizedBox(width: 10),
-                        // Indicator(
-                        //   positionIndex: 2,
-                        //   currentIndex: currentIndex,
-                        // ),
-                      ],
-                    ),
-                  ),
+                  // Positioned(
+                  //   bottom: 60,
+                  //   left: 150,
+                  //   child: Row(
+                  //     mainAxisSize: MainAxisSize.max,
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Indicator(
+                  //         positionIndex: 0,
+                  //         currentIndex: currentIndex,
+                  //       ),
+                  //       // SizedBox(width: 10),
+                  //       // Indicator(
+                  //       //   positionIndex: 1,
+                  //       //   currentIndex: currentIndex,
+                  //       // ),
+                  //       // SizedBox(width: 10),
+                  //       // Indicator(
+                  //       //   positionIndex: 2,
+                  //       //   currentIndex: currentIndex,
+                  //       // ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
       ),

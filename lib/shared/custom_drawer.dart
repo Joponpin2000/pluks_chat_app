@@ -20,32 +20,6 @@ class CustomDrawer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: mediaQuery.size.width * .8,
-            child: ListTile(
-              leading: Icon(
-                Icons.exit_to_app,
-                color: Colors.red,
-              ),
-              title: FlatButton(
-                color: Colors.grey,
-                onPressed: () {
-                  AuthClass().signOut();
-                  HelperFunctions.saveUserLoggedInSharedPreference(false);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Authenticate(),
-                    ),
-                  );
-                },
-                child: Text(
-                  "Logout",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-          Container(
             color: Colors.black,
             height: 0.1,
           ),
@@ -74,6 +48,33 @@ class CustomDrawer extends StatelessWidget {
           Container(
             color: Colors.black,
             height: 0.1,
+          ),
+          SizedBox(height: 20),
+          Container(
+            width: mediaQuery.size.width * .8,
+            child: ListTile(
+              leading: Icon(
+                Icons.exit_to_app,
+                color: Colors.red,
+              ),
+              title: FlatButton(
+                color: Theme.of(context).primaryColor,
+                onPressed: () {
+                  AuthClass().signOut();
+                  HelperFunctions.saveUserLoggedInSharedPreference(false);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Authenticate(),
+                    ),
+                  );
+                },
+                child: Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
           ),
         ],
       ),

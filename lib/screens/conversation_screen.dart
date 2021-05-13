@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:pluks_chat_app/services/database.dart';
 import 'package:pluks_chat_app/shared/constants.dart';
@@ -21,6 +23,7 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
+  final _scrollController = ScrollController();
   DatabaseClass databaseClass = new DatabaseClass();
   TextEditingController messageController = new TextEditingController();
   TextEditingController emojiMessageController = new TextEditingController();
@@ -36,6 +39,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   bottom: 70,
                 ),
                 child: ListView.builder(
+                  controller: _scrollController,
                   shrinkWrap: true,
                   itemCount: snapshot.data.docs.length,
                   itemBuilder: (context, index) {
@@ -100,7 +104,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          messageController.text = item;
+          emojiMessageController.text = emojiMessageController.text + item;
         });
       },
       child: Padding(
@@ -119,126 +123,129 @@ class _ConversationScreenState extends State<ConversationScreen> {
       showModalBottomSheet(
           context: context,
           builder: (context) {
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(40),
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          margin: EdgeInsets.only(
+                            left: 5,
+                            top: 5,
+                            bottom: 5,
+                          ),
+                          padding: EdgeInsets.only(
+                            left: 10,
+                            top: 5,
+                            bottom: 5,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: emojiMessageController,
+                                  readOnly: true,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      emojiMessageController.text = value;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    hintStyle: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    emojiMessageController.text = "";
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(15),
+                                  child: Text(
+                                    "x",
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        padding: EdgeInsets.only(
-                          left: 10,
-                          top: 5,
-                          bottom: 5,
+                      ),
+                      // SizedBox(width: 2),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.15,
+                        margin: EdgeInsets.only(
+                          right: 10,
                         ),
-                        child: TextField(
-                          controller: emojiMessageController,
-                          onChanged: (value) {
-                            setState(() {
-                              emojiMessageController.text = value;
-                            });
+                        child: GestureDetector(
+                          onTap: () {
+                            sendEmojiMessage();
                           },
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(
-                              color: Colors.black,
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Theme.of(context).primaryColor,
+                            child: Icon(
+                              Icons.send,
+                              color: Theme.of(context).accentColor,
                             ),
-                            border: InputBorder.none,
                           ),
                         ),
                       ),
-                    ),
-                    // SizedBox(width: 2),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.15,
-                      child: GestureDetector(
-                        onTap: () {
-                          sendEmojiMessage();
-                        },
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Theme.of(context).primaryColor,
-                          child: Icon(
-                            Icons.send,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                GridView.builder(
-                  physics: ScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: HelperFunctions().emojis.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 8),
-                  itemBuilder: (context, index) => emojiItem(
-                    item: HelperFunctions().emojis[index],
+                    ],
                   ),
-                ),
-              ],
+                  GridView.builder(
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: HelperFunctions().emojis.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 8),
+                    itemBuilder: (context, index) => emojiItem(
+                      item: HelperFunctions().emojis[index],
+                    ),
+                  ),
+                ],
+              ),
             );
           });
     }
+
+    Timer(
+      Duration(seconds: 1),
+      () => _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(seconds: 1),
+        curve: Curves.fastOutSlowIn,
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            // CircleAvatar(
-            //   backgroundColor: Theme.of(context).primaryColor,
-            //                 child: (widget.recipientImageUrl == null)
-            //                     ? Image.asset(
-            //                         "assets/d-p.png",
-            //                         fit: BoxFit.fill,
-            //                       )
-            //                     : widget.recipientImageUrl.isNotEmpty
-            //                         ? Image.network(
-            //                             widget.recipientImageUrl,
-            //                             fit: BoxFit.fill,
-            //                           )
-            //                         : Center(
-            //                             child: CircularProgressIndicator(
-            //                               backgroundColor:
-            //                                   Theme.of(context).primaryColor,
-            //                             ),
-            //                           ),
-            //   // child: (widget.recipientImageUrl != null)
-            //   //     ? Image.network(widget.recipientImageUrl) ??
-            //   //         Image.network(
-            //   //           widget.recipientImageUrl,
-            //   //           fit: BoxFit.fill,
-            //   //         )
-            //   //     : Image.asset(
-            //   //         "assets/d-p.png",
-            //   //         fit: BoxFit.fill,
-            //   //       ),
-            // ),
             Padding(
               padding: const EdgeInsets.only(left: 10.0),
-              child: Text(widget.recipientName.substring(0, 10)),
+              child: Text(widget.recipientName.length > 10
+                  ? widget.recipientName.substring(0, 10)
+                  : widget.recipientName),
             ),
           ],
         ),
         elevation: 0.0,
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.all(8.0),
-        //     child: Icon(Icons.search),
-        //   ),
-        //   GestureDetector(
-        //     onTap: () {},
-        //     child: Padding(
-        //       padding: const EdgeInsets.only(right: 15.0),
-        //       child: Icon(Icons.more_vert),
-        //     ),
-        //   ),
-        // ],
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: Container(
@@ -250,7 +257,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ),
         ),
         child: Stack(
-          // mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             chatMessageList(),
             Container(
@@ -312,7 +318,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ),
                       ),
                     ),
-                    // SizedBox(width: 2),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.15,
                       child: GestureDetector(
@@ -348,8 +353,7 @@ class MessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(
-          left: isSendByMe ? 0 : 20, right: isSendByMe ? 20 : 0),
+      padding: EdgeInsets.only(left: 20, right: 20),
       margin: EdgeInsets.symmetric(vertical: 3),
       width: MediaQuery.of(context).size.width,
       alignment: isSendByMe ? Alignment.centerRight : Alignment.centerLeft,
